@@ -36,3 +36,5 @@ Create or move a tag only after the variant's own verification gate succeeds. Sn
 6. Verify that the tag archive reproduces the tested commit.
 
 The SQLite variants use `JAVA8_HOME` or `JAVA25_HOME` as documented by their branch. The PostgreSQL variants use `DATABASE_URL` and a disposable PostgreSQL database for integration and packaged-JAR tests.
+
+PostgreSQL Java 25 verification additionally requires `POSTGRES_TEST_URL`; this prevents integration and E2E tests from silently being skipped.

@@ -1,5 +1,10 @@
 import { loadDotEnv, java25Env, run } from "./env";
 await loadDotEnv();
+if (!process.env.POSTGRES_TEST_URL?.startsWith("jdbc:postgresql://")) {
+	throw new Error(
+		"POSTGRES_TEST_URL must point to a disposable PostgreSQL test database.",
+	);
+}
 const commands: string[][] = [
 	["bun", "run", "typecheck"],
 	["bun", "run", "lint"],

@@ -28,7 +28,7 @@ public class MigrationRunner {
             connection.setAutoCommit(false);
             try (Statement statement = connection.createStatement()) {
                 statement.execute("CREATE TABLE IF NOT EXISTS java_standard_schema_migrations "
-                        + "(filename TEXT PRIMARY KEY, applied_at INTEGER NOT NULL)");
+                        + "(filename VARCHAR(255) PRIMARY KEY, applied_at BIGINT NOT NULL)");
             }
             for (String migration : MIGRATIONS) {
                 if (!isApplied(connection, migration)) {

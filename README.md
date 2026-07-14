@@ -8,6 +8,7 @@ Java 25 を実行対象にした、Spring Boot 4 + MyBatis 4 + PostgreSQL の最
 - Bun
 - Gradle Wrapper 9.1.0 以上を使用します
 - PostgreSQL 14以上と `DATABASE_URL=jdbc:postgresql://...` を設定します
+- integration/E2E検証には、破棄可能な `POSTGRES_TEST_URL=jdbc:postgresql://...` も設定します
 
 ## 開発
 

@@ -46,6 +46,7 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.named('test') {
     useJUnitPlatform()
+    inputs.property('postgresTestUrl', providers.environmentVariable('POSTGRES_TEST_URL').orElse(''))
     finalizedBy tasks.named('jacocoTestReport')
 }
 
