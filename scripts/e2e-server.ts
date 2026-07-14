@@ -4,7 +4,9 @@ import { loadDotEnv, java25Env, run } from "./env";
 await loadDotEnv();
 await mkdir("tmp", { recursive: true });
 if (!process.env.POSTGRES_TEST_URL) {
-	throw new Error("POSTGRES_TEST_URL must point to a disposable PostgreSQL database.");
+	throw new Error(
+		"POSTGRES_TEST_URL must point to a disposable PostgreSQL database.",
+	);
 }
 
 const env: Record<string, string> = {

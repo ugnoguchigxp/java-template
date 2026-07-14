@@ -16,7 +16,8 @@ export type AuthUser = AuthSessionUser;
 export type LoginParams = LoginInput & { redirectTo?: string };
 export type LoginResponse = AuthResponse;
 
-export const UNAUTHORIZED_EVENT_NAME = "java25-postgresql-template:unauthorized";
+export const UNAUTHORIZED_EVENT_NAME =
+	"java25-postgresql-template:unauthorized";
 export const authMeQueryKey = ["auth", "me"] as const;
 export const protectedProfileQueryKey = ["protected", "profile"] as const;
 
