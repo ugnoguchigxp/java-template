@@ -1,12 +1,12 @@
-# Java 8 SQLite Template
+# Java 25 SQLite Template
 
-Java 8 を実行対象にした、Spring Boot 2.7 + MyBatis + SQLite の最小構成テンプレートです。フロントエンドは `../hono-standard` の React/Vite UI、Design System、Showcase をコピーして使用します。SSG/SSR と Docker は含めません。
+Java 25 を実行対象にした、Spring Boot 4 + MyBatis 4 + SQLite の最小構成テンプレートです。フロントエンドは `../hono-standard` の React/Vite UI、Design System、Showcase をコピーして使用します。SSG/SSR と Docker は含めません。
 
 ## 前提
 
-- Java 8（`JAVA8_HOME` を設定）
+- Java 25（`JAVA25_HOME` を設定。Temurin 25.0.2 など）
 - Bun
-- macOS で Apple Silicon の場合、Temurin 8 x64 は Rosetta 経由で実行します
+- Gradle Wrapper 9.1.0 以上を使用します
 
 ## 開発
 
@@ -28,7 +28,7 @@ printf '%s\n' 'password123456' | bun run auth:create-admin -- --email admin@exam
 ## 検証
 
 ```sh
-bun run verify       # TypeScript/Frontend + Java 8 compile/test/coverage/JAR
+bun run verify        # TypeScript/Frontend + Java 25 compile/test/coverage/JAR
 bun run test:e2e     # Playwright (SQLite の一時 DB を使用)
 bun run contract:check
 ```
@@ -37,7 +37,7 @@ Java 側の主要なエンドポイントは `/api/health`、`/api/csrf`、`/api
 
 ## 構成
 
-- `src/main/java`: Java 8 対応の API、認証、SQLite/MyBatis 境界
+- `src/main/java`: Java 25 対応の API、認証、SQLite/MyBatis 境界
 - `db/migration`: SQLite SQL マイグレーション
 - `web`: hono-standard からコピーした UI（Home/Login/Protected/Showcase）
 - `shared/schemas`: UI と API で共有する Zod スキーマ

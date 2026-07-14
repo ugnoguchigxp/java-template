@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "java8-sqlite-template",
+      "name": "java25-sqlite-template",
       "dependencies": {
         "@tanstack/react-query": "5.101.0",
         "@tanstack/react-router": "1.170.15",

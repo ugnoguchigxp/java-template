@@ -1,4 +1,4 @@
-import { loadDotEnv, java8Env, run } from "./env";
+import { loadDotEnv, java25Env, run } from "./env";
 await loadDotEnv();
 const commands: string[][] = [
 	["bun", "run", "typecheck"],
@@ -7,12 +7,19 @@ const commands: string[][] = [
 	["bun", "run", "contract:check"],
 	["bun", "run", "test"],
 	["bun", "run", "build:web"],
-	["./gradlew", "--no-daemon", "check", "verifyJava8Bytecode", "bootJar"],
+	[
+		"./gradlew",
+		"--no-daemon",
+		"check",
+		"verifyJava25Runtime",
+		"verifyJava25Bytecode",
+		"bootJar",
+	],
 ];
 for (const command of commands) {
 	const code = await run(
 		command,
-		command[0] === "./gradlew" ? java8Env() : process.env,
+		command[0] === "./gradlew" ? java25Env() : process.env,
 	);
 	if (code !== 0) process.exit(code);
 }

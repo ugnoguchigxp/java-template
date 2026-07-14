@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Java 8 SQLite Template API
+  title: Java 25 SQLite Template API
   version: 0.1.0
 servers:
   - url: /

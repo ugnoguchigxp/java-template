@@ -1,7 +1,7 @@
 {
-	"name": "java8-sqlite-template",
+	"name": "java25-sqlite-template",
 	"version": "1.0.0",
-	"description": "Java 8 + SQLite + MyBatis template with a copied React frontend.",
+	"description": "Java 25 + SQLite + MyBatis template with a copied React frontend.",
 	"type": "module",
 	"author": "ugnoguchigxp <ugnoguchigxp@gmail.com>",
 	"license": "MIT",

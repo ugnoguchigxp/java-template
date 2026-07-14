@@ -5,7 +5,7 @@ server:
 
 spring:
   application:
-    name: java8-sqlite-template
+    name: java25-sqlite-template
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:development}
   jackson:

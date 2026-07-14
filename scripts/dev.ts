@@ -1,7 +1,7 @@
-import { loadDotEnv, java8Env } from "./env";
+import { loadDotEnv, java25Env } from "./env";
 
 await loadDotEnv();
-const env = java8Env();
+const env = java25Env();
 const backend = Bun.spawn(["./gradlew", "--no-daemon", "bootRun"], {
 	stdout: "inherit",
 	stderr: "inherit",

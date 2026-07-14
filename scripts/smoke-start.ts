@@ -1,13 +1,13 @@
-import { loadDotEnv, java8Env, run } from "./env";
+import { loadDotEnv, java25Env, run } from "./env";
 await loadDotEnv();
-const env = java8Env();
+const env = java25Env();
 const jarExit = await run(["./gradlew", "--no-daemon", "bootJar"], env);
 if (jarExit !== 0) process.exit(jarExit);
 const child = Bun.spawn(
 	[
 		`${env.JAVA_HOME}/bin/java`,
 		"-jar",
-		"build/libs/java8-sqlite-template-0.1.0.jar",
+		"build/libs/java25-sqlite-template-0.1.0.jar",
 	],
 	{
 		stdout: "inherit",

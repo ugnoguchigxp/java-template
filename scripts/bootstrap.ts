@@ -1,5 +1,5 @@
 import { mkdir } from "node:fs/promises";
-import { loadDotEnv, java8Env, run } from "./env";
+import { loadDotEnv, java25Env, run } from "./env";
 
 const envFile = Bun.file(".env");
 if (!(await envFile.exists())) {
@@ -11,6 +11,6 @@ const installExit = await run(["bun", "install", "--frozen-lockfile"]);
 if (installExit !== 0) process.exit(installExit);
 const migrateExit = await run(
 	["./gradlew", "--no-daemon", "dbMigrate"],
-	java8Env(),
+	java25Env(),
 );
 process.exit(migrateExit);

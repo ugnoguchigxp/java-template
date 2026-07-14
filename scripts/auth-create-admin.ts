@@ -1,7 +1,7 @@
-import { loadDotEnv, java8Env, run } from "./env";
+import { loadDotEnv, java25Env, run } from "./env";
 await loadDotEnv();
 let args = process.argv.slice(2);
-const env = java8Env();
+const env = java25Env();
 if (args.includes("--password-stdin")) {
 	const password = (await new Response(Bun.stdin.stream()).text()).replace(
 		/\r?\n$/,

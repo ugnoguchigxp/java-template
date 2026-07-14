@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
@@ -64,7 +64,7 @@ public class ApplicationSmokeTest {
     @Test
     void loginMeProtectedAndLogoutUseCookiesAndCsrf() throws Exception {
         MvcResult csrf = mockMvc.perform(get("/api/csrf")).andReturn();
-        javax.servlet.http.Cookie csrfCookie = csrf.getResponse().getCookie("XSRF-TOKEN");
+        jakarta.servlet.http.Cookie csrfCookie = csrf.getResponse().getCookie("XSRF-TOKEN");
         assertThat(csrfCookie).isNotNull();
         String token = csrfCookie.getValue();
         String json = "{\"email\":\"" + email + "\",\"password\":\"password123456\"}";
@@ -76,8 +76,8 @@ public class ApplicationSmokeTest {
                         .content(json))
                 .andExpect(status().isOk())
                 .andReturn();
-        javax.servlet.http.Cookie access = login.getResponse().getCookie("access_token");
-        javax.servlet.http.Cookie refresh = login.getResponse().getCookie("refresh_token");
+        jakarta.servlet.http.Cookie access = login.getResponse().getCookie("access_token");
+        jakarta.servlet.http.Cookie refresh = login.getResponse().getCookie("refresh_token");
         assertThat(access).isNotNull();
         assertThat(refresh).isNotNull();
 
@@ -115,7 +115,7 @@ public class ApplicationSmokeTest {
     @Test
     void refreshTokenRotatesAndRejectsReplay() throws Exception {
         MvcResult csrf = mockMvc.perform(get("/api/csrf")).andReturn();
-        javax.servlet.http.Cookie csrfCookie = csrf.getResponse().getCookie("XSRF-TOKEN");
+        jakarta.servlet.http.Cookie csrfCookie = csrf.getResponse().getCookie("XSRF-TOKEN");
         String token = csrfCookie.getValue();
         MvcResult login = mockMvc.perform(post("/api/auth/login")
                         .cookie(csrfCookie)
@@ -124,7 +124,7 @@ public class ApplicationSmokeTest {
                         .content("{\"email\":\"" + email + "\",\"password\":\"password123456\"}"))
                 .andExpect(status().isOk())
                 .andReturn();
-        javax.servlet.http.Cookie oldRefresh = login.getResponse().getCookie("refresh_token");
+        jakarta.servlet.http.Cookie oldRefresh = login.getResponse().getCookie("refresh_token");
         assertThat(oldRefresh).isNotNull();
 
         MvcResult rotated = mockMvc.perform(post("/api/auth/refresh")
@@ -132,7 +132,7 @@ public class ApplicationSmokeTest {
                         .header("X-XSRF-TOKEN", token))
                 .andExpect(status().isOk())
                 .andReturn();
-        javax.servlet.http.Cookie newRefresh = rotated.getResponse().getCookie("refresh_token");
+        jakarta.servlet.http.Cookie newRefresh = rotated.getResponse().getCookie("refresh_token");
         assertThat(newRefresh).isNotNull();
         assertThat(newRefresh.getValue()).isNotEqualTo(oldRefresh.getValue());
 
@@ -149,7 +149,7 @@ public class ApplicationSmokeTest {
     @Test
     void invalidLoginPayloadReturnsBadRequest() throws Exception {
         MvcResult csrf = mockMvc.perform(get("/api/csrf")).andReturn();
-        javax.servlet.http.Cookie csrfCookie = csrf.getResponse().getCookie("XSRF-TOKEN");
+        jakarta.servlet.http.Cookie csrfCookie = csrf.getResponse().getCookie("XSRF-TOKEN");
         mockMvc.perform(post("/api/auth/login")
                         .cookie(csrfCookie)
                         .header("X-XSRF-TOKEN", csrfCookie.getValue())
@@ -161,7 +161,7 @@ public class ApplicationSmokeTest {
     @Test
     void inactiveUserIsRejectedByCurrentUserAndProtectedEndpoints() throws Exception {
         MvcResult csrf = mockMvc.perform(get("/api/csrf")).andReturn();
-        javax.servlet.http.Cookie csrfCookie = csrf.getResponse().getCookie("XSRF-TOKEN");
+        jakarta.servlet.http.Cookie csrfCookie = csrf.getResponse().getCookie("XSRF-TOKEN");
         MvcResult login = mockMvc.perform(post("/api/auth/login")
                         .cookie(csrfCookie)
                         .header("X-XSRF-TOKEN", csrfCookie.getValue())
@@ -169,7 +169,7 @@ public class ApplicationSmokeTest {
                         .content("{\"email\":\"" + email + "\",\"password\":\"password123456\"}"))
                 .andExpect(status().isOk())
                 .andReturn();
-        javax.servlet.http.Cookie access = login.getResponse().getCookie("access_token");
+        jakarta.servlet.http.Cookie access = login.getResponse().getCookie("access_token");
         try (Connection connection = dataSource.getConnection();
              java.sql.PreparedStatement statement = connection.prepareStatement(
                      "UPDATE users SET is_active = 0 WHERE normalized_email = ?")) {

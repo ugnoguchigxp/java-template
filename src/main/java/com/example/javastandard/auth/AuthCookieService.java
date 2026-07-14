@@ -4,7 +4,7 @@ import com.example.javastandard.config.AppProperties;
 import java.time.Duration;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class AuthCookieService {

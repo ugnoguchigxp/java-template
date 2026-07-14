@@ -1,3 +1,3 @@
-import { loadDotEnv, java8Env, run } from "./env";
+import { loadDotEnv, java25Env, run } from "./env";
 await loadDotEnv();
-process.exit(await run(["./gradlew", "--no-daemon", "dbMigrate"], java8Env()));
+process.exit(await run(["./gradlew", "--no-daemon", "dbMigrate"], java25Env()));

@@ -1,5 +1,5 @@
 import { mkdir, rm } from "node:fs/promises";
-import { loadDotEnv, java8Env, run } from "./env";
+import { loadDotEnv, java25Env, run } from "./env";
 
 await loadDotEnv();
 await mkdir("tmp", { recursive: true });
@@ -8,7 +8,7 @@ await rm("tmp/e2e.sqlite-shm", { force: true });
 await rm("tmp/e2e.sqlite-wal", { force: true });
 
 const env: Record<string, string> = {
-	...java8Env(),
+	...java25Env(),
 	SPRING_PROFILES_ACTIVE: "development",
 	HOST: "127.0.0.1",
 	DATABASE_URL: "tmp/e2e.sqlite",
@@ -40,7 +40,7 @@ const child = Bun.spawn(
 	[
 		`${env.JAVA_HOME}/bin/java`,
 		"-jar",
-		"build/libs/java8-sqlite-template-0.1.0.jar",
+		"build/libs/java25-sqlite-template-0.1.0.jar",
 		"--server.port=5174",
 	],
 	{

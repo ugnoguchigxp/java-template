@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.7.18'
+    id 'org.springframework.boot' version '4.0.6'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'jacoco'
 }
@@ -9,8 +9,9 @@ group = 'com.example'
 version = '0.1.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 configurations {
@@ -20,7 +21,7 @@ configurations {
 }
 
 ext {
-    mybatisSpringBootVersion = '2.3.2'
+    mybatisSpringBootVersion = '4.0.0'
     sqliteJdbcVersion = '3.53.1.0'
 }
 
@@ -33,11 +34,13 @@ dependencies {
     runtimeOnly "org.xerial:sqlite-jdbc:${sqliteJdbcVersion}"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.release = 25
     options.compilerArgs += ['-parameters']
 }
 
@@ -47,7 +50,7 @@ tasks.named('test') {
 }
 
 jacoco {
-    toolVersion = '0.8.11'
+    toolVersion = '0.8.15'
 }
 
 def coverageExcludes = [
@@ -86,33 +89,52 @@ jacocoTestCoverageVerification {
     }
 }
 
-def java8Home = providers.environmentVariable('JAVA8_HOME')
+def java25Home = providers.environmentVariable('JAVA25_HOME')
 
-tasks.register('verifyJava8Bytecode') {
+tasks.register('verifyJava25Runtime') {
     group = 'verification'
-    description = 'Fails unless JAVA8_HOME points to a Java 8 runtime.'
+    description = 'Fails unless JAVA25_HOME points to a Java 25 runtime.'
     doLast {
-        if (!java8Home.isPresent()) {
-            throw new GradleException('JAVA8_HOME must point to a Java 8 JDK.')
+        if (!java25Home.isPresent()) {
+            throw new GradleException('JAVA25_HOME must point to a Java 25 JDK.')
         }
-        def javaBin = new File(java8Home.get(), 'bin/java')
+        def javaBin = new File(java25Home.get(), 'bin/java')
         if (!javaBin.exists()) {
-            throw new GradleException("JAVA8_HOME does not contain bin/java: ${javaBin}")
+            throw new GradleException("JAVA25_HOME does not contain bin/java: ${javaBin}")
         }
-        def output = new ByteArrayOutputStream()
-        exec {
-            commandLine javaBin.absolutePath, '-version'
-            errorOutput = output
-            ignoreExitValue = false
+        def process = [javaBin.absolutePath, '-version'].execute()
+        process.waitFor()
+        def output = process.err.text + process.in.text
+        if (process.exitValue() != 0 || !output.contains('25')) {
+            throw new GradleException("JAVA25_HOME is not Java 25: ${output}")
         }
-        if (!output.toString('UTF-8').contains('1.8')) {
-            throw new GradleException("JAVA8_HOME is not Java 8: ${output}")
+    }
+}
+
+tasks.register('verifyJava25Bytecode') {
+    group = 'verification'
+    dependsOn tasks.named('compileJava')
+    doLast {
+        def classes = fileTree("${layout.buildDirectory.get()}/classes/java/main") {
+            include '**/*.class'
+        }.files
+        if (classes.isEmpty()) throw new GradleException('No compiled Java classes found.')
+        classes.each { classFile ->
+            classFile.withInputStream { input ->
+                def magic = input.read() << 24 | input.read() << 16 | input.read() << 8 | input.read()
+                def minor = input.read() << 8 | input.read()
+                def major = input.read() << 8 | input.read()
+                if (magic != -889275714 || major != 69) {
+                    throw new GradleException("Expected Java 25 classfile (major 69): ${classFile} major=${major} minor=${minor}")
+                }
+            }
         }
     }
 }
 
 tasks.named('check') {
     dependsOn tasks.named('jacocoTestCoverageVerification')
+    dependsOn tasks.named('verifyJava25Bytecode')
 }
 
 tasks.register('dbMigrate', JavaExec) {

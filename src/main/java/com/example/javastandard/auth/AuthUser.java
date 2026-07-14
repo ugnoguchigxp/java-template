@@ -2,19 +2,10 @@ package com.example.javastandard.auth;
 
 import com.example.javastandard.db.model.UserRecord;
 
-public class AuthUser {
-    private final String id;
-    private final String email;
-    private final String displayName;
-    private final String role;
-    private final boolean active;
-
+public record AuthUser(String id, String email, String displayName, String role, boolean active) {
     public AuthUser(UserRecord record) {
-        this.id = record.getId();
-        this.email = record.getEmail();
-        this.displayName = record.getDisplayName();
-        this.role = "admin".equals(record.getRole()) ? "admin" : "member";
-        this.active = record.isActive();
+        this(record.getId(), record.getEmail(), record.getDisplayName(),
+                "admin".equals(record.getRole()) ? "admin" : "member", record.isActive());
     }
 
     public String getId() { return id; }

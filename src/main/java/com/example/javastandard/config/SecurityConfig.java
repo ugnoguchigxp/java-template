@@ -72,30 +72,29 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             BearerCookieAuthenticationFilter bearerFilter,
-            CsrfGuardFilter csrfFilter) throws Exception {
+            CsrfGuardFilter csrfFilter,
+            AppProperties properties) throws Exception {
         AuthenticationEntryPoint entryPoint = (request, response, exception) -> {
             response.setStatus(401);
             response.setContentType("application/json");
             response.getWriter().write("{\"message\":\"Unauthorized\",\"code\":\"AUTH_UNAUTHORIZED\"}");
         };
         http
-                .csrf().disable()
-                .cors().and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .exceptionHandling().authenticationEntryPoint(entryPoint).and()
-                .authorizeRequests()
-                .antMatchers("/", "/index.html", "/favicon.ico", "/assets/**",
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource(properties)))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(entryPoint))
+                .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/", "/index.html", "/favicon.ico", "/assets/**",
                         "/api/health", "/api/csrf",
                         "/api/auth/login", "/api/auth/refresh", "/api/auth/logout").permitAll()
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/api/auth/me", "/api/protected/**").authenticated()
-                .anyRequest().permitAll()
-                .and()
-                .headers()
-                .contentSecurityPolicy("default-src 'self'; object-src 'none'; frame-ancestors 'self'; base-uri 'self';")
-                .and()
-                .frameOptions().sameOrigin()
-                .and()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/api/auth/me", "/api/protected/**").authenticated()
+                .anyRequest().permitAll())
+                .headers(headers -> headers
+                .contentSecurityPolicy(policy -> policy.policyDirectives(
+                        "default-src 'self'; object-src 'none'; frame-ancestors 'self'; base-uri 'self';"))
+                .frameOptions(frame -> frame.sameOrigin()))
                 .addFilterBefore(csrfFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(bearerFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

@@ -16,13 +16,13 @@ export async function loadDotEnv(path = ".env"): Promise<void> {
 	}
 }
 
-export function java8Env(): Record<string, string> {
-	const java8Home = process.env.JAVA8_HOME;
-	if (!java8Home) throw new Error("JAVA8_HOME must point to a Java 8 JDK.");
+export function java25Env(): Record<string, string> {
+	const java25Home = process.env.JAVA25_HOME;
+	if (!java25Home) throw new Error("JAVA25_HOME must point to a Java 25 JDK.");
 	return {
 		...(process.env as Record<string, string>),
-		JAVA_HOME: java8Home,
-		PATH: `${java8Home}/bin:${process.env.PATH ?? ""}`,
+		JAVA_HOME: java25Home,
+		PATH: `${java25Home}/bin:${process.env.PATH ?? ""}`,
 	};
 }
 
