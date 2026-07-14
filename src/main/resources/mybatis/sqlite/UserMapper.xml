@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.javastandard.db.mapper.UserMapper">
+  <resultMap id="UserResultMap" type="com.example.javastandard.db.model.UserRecord">
+    <id property="id" column="id"/>
+    <result property="email" column="email"/>
+    <result property="normalizedEmail" column="normalized_email"/>
+    <result property="passwordHash" column="password_hash"/>
+    <result property="displayName" column="display_name"/>
+    <result property="role" column="role"/>
+    <result property="active" column="is_active" jdbcType="INTEGER"/>
+    <result property="lastLoginAt" column="last_login_at" jdbcType="BIGINT"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+  </resultMap>
+
+  <select id="findById" resultMap="UserResultMap">
+    SELECT id, email, normalized_email, password_hash, display_name, role,
+           is_active, last_login_at, created_at, updated_at
+    FROM users
+    WHERE id = #{id}
+  </select>
+
+  <select id="findByNormalizedEmail" resultMap="UserResultMap">
+    SELECT id, email, normalized_email, password_hash, display_name, role,
+           is_active, last_login_at, created_at, updated_at
+    FROM users
+    WHERE normalized_email = #{email}
+  </select>
+
+  <insert id="insert" parameterType="com.example.javastandard.db.model.UserRecord">
+    INSERT INTO users (
+      id, email, normalized_email, password_hash, display_name, role,
+      is_active, last_login_at, created_at, updated_at
+    ) VALUES (
+      #{id}, #{email}, #{normalizedEmail}, #{passwordHash}, #{displayName}, #{role},
+      #{active}, #{lastLoginAt}, #{createdAt}, #{updatedAt}
+    )
+  </insert>
+
+  <update id="updateLastLogin">
+    UPDATE users
+    SET last_login_at = #{updatedAt}, updated_at = #{updatedAt}
+    WHERE id = #{id}
+  </update>
+</mapper>

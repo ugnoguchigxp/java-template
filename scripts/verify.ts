@@ -1,0 +1,18 @@
+import { loadDotEnv, java8Env, run } from "./env";
+await loadDotEnv();
+const commands: string[][] = [
+	["bun", "run", "typecheck"],
+	["bun", "run", "lint"],
+	["bun", "run", "format:check"],
+	["bun", "run", "contract:check"],
+	["bun", "run", "test"],
+	["bun", "run", "build:web"],
+	["./gradlew", "--no-daemon", "check", "verifyJava8Bytecode", "bootJar"],
+];
+for (const command of commands) {
+	const code = await run(
+		command,
+		command[0] === "./gradlew" ? java8Env() : process.env,
+	);
+	if (code !== 0) process.exit(code);
+}

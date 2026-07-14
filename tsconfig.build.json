@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "."
+  },
+  "include": [
+    "web/**/*",
+    "shared/**/*.ts"
+  ],
+  "exclude": [
+    "web/**/*.test.ts",
+    "web/**/*.spec.ts",
+    "shared/**/*.test.ts",
+    "shared/**/*.spec.ts"
+  ]
+}

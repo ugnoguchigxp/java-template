@@ -1,0 +1,153 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.7.18'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
+}
+
+group = 'com.example'
+version = '0.1.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+ext {
+    mybatisSpringBootVersion = '2.3.2'
+    sqliteJdbcVersion = '3.53.1.0'
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
+    implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:${mybatisSpringBootVersion}"
+    runtimeOnly "org.xerial:sqlite-jdbc:${sqliteJdbcVersion}"
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-parameters']
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    finalizedBy tasks.named('jacocoTestReport')
+}
+
+jacoco {
+    toolVersion = '0.8.11'
+}
+
+def coverageExcludes = [
+        '**/cli/**',
+        '**/web/ErrorResponse.class',
+        '**/web/GlobalExceptionHandler*.class',
+        '**/auth/AuthException.class'
+]
+
+jacocoTestReport {
+    dependsOn test
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: coverageExcludes)
+        }))
+    }
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+jacocoTestCoverageVerification {
+    dependsOn test
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: coverageExcludes)
+        }))
+    }
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.80
+            }
+        }
+    }
+}
+
+def java8Home = providers.environmentVariable('JAVA8_HOME')
+
+tasks.register('verifyJava8Bytecode') {
+    group = 'verification'
+    description = 'Fails unless JAVA8_HOME points to a Java 8 runtime.'
+    doLast {
+        if (!java8Home.isPresent()) {
+            throw new GradleException('JAVA8_HOME must point to a Java 8 JDK.')
+        }
+        def javaBin = new File(java8Home.get(), 'bin/java')
+        if (!javaBin.exists()) {
+            throw new GradleException("JAVA8_HOME does not contain bin/java: ${javaBin}")
+        }
+        def output = new ByteArrayOutputStream()
+        exec {
+            commandLine javaBin.absolutePath, '-version'
+            errorOutput = output
+            ignoreExitValue = false
+        }
+        if (!output.toString('UTF-8').contains('1.8')) {
+            throw new GradleException("JAVA8_HOME is not Java 8: ${output}")
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('jacocoTestCoverageVerification')
+}
+
+tasks.register('dbMigrate', JavaExec) {
+    group = 'database'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.example.javastandard.cli.DatabaseMigrateCommand'
+}
+
+tasks.register('authCreateAdmin', JavaExec) {
+    group = 'database'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.example.javastandard.cli.AuthCreateAdminCommand'
+}
+
+tasks.register('seedDev', JavaExec) {
+    group = 'database'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.example.javastandard.cli.SeedDevCommand'
+}
+
+tasks.named('processResources') {
+    dependsOn ':buildWeb'
+    from('dist-web') {
+        into 'static'
+    }
+    from('db/migration') {
+        into 'db/migration'
+    }
+}
+
+tasks.register('buildWeb', Exec) {
+    group = 'build'
+    commandLine 'bun', 'run', 'build:web'
+}
+
+tasks.named('bootJar') {
+    dependsOn tasks.named('buildWeb')
+}

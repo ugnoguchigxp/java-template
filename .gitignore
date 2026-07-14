@@ -1,0 +1,14 @@
+.env
+.DS_Store
+data/
+tmp/
+build/
+.gradle/
+dist-web/
+coverage/
+playwright-report/
+test-results/
+node_modules/
+*.db
+*.sqlite
+*.sqlite3
