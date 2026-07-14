@@ -1,11 +1,11 @@
 {
-	"name": "java25-sqlite-template",
+	"name": "java25-postgresql-template",
 	"version": "1.0.0",
-	"description": "Java 25 + SQLite + MyBatis template with a copied React frontend.",
+	"description": "Java 25 + PostgreSQL + MyBatis template with a copied React frontend.",
 	"type": "module",
 	"author": "ugnoguchigxp <ugnoguchigxp@gmail.com>",
 	"license": "MIT",
-	"keywords": ["java", "sqlite", "mybatis", "react", "vite", "typescript"],
+	"keywords": ["java", "postgresql", "mybatis", "react", "vite", "typescript"],
 	"scripts": {
 		"dev": "bun scripts/dev.ts",
 		"dev:vite": "vite",

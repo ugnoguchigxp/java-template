@@ -1,12 +1,13 @@
-# Java 25 SQLite Template
+# Java 25 PostgreSQL Template
 
-Java 25 を実行対象にした、Spring Boot 4 + MyBatis 4 + SQLite の最小構成テンプレートです。フロントエンドは `../hono-standard` の React/Vite UI、Design System、Showcase をコピーして使用します。SSG/SSR と Docker は含めません。
+Java 25 を実行対象にした、Spring Boot 4 + MyBatis 4 + PostgreSQL の最小構成テンプレートです。フロントエンドは `../hono-standard` の React/Vite UI、Design System、Showcase をコピーして使用します。SSG/SSR と Docker は含めません。
 
 ## 前提
 
 - Java 25（`JAVA25_HOME` を設定。Temurin 25.0.2 など）
 - Bun
 - Gradle Wrapper 9.1.0 以上を使用します
+- PostgreSQL 14以上と `DATABASE_URL=jdbc:postgresql://...` を設定します
 
 ## 開発
 
@@ -37,10 +38,8 @@ Java 側の主要なエンドポイントは `/api/health`、`/api/csrf`、`/api
 
 ## 構成
 
-- `src/main/java`: Java 25 対応の API、認証、SQLite/MyBatis 境界
-- `db/migration`: SQLite SQL マイグレーション
+- `src/main/java`: Java 25 対応の API、認証、PostgreSQL/MyBatis 境界
+- `db/migration`: PostgreSQL SQL マイグレーション
 - `web`: hono-standard からコピーした UI（Home/Login/Protected/Showcase）
 - `shared/schemas`: UI と API で共有する Zod スキーマ
 - `api-contract/openapi.yaml`: API 契約
-
-PostgreSQL は現時点では実装せず、Repository/MyBatis mapper と migration を差し替えられる境界だけを維持します。

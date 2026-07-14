@@ -22,7 +22,7 @@ configurations {
 
 ext {
     mybatisSpringBootVersion = '4.0.0'
-    sqliteJdbcVersion = '3.53.1.0'
+    postgresqlJdbcVersion = '42.7.7'
 }
 
 dependencies {
@@ -31,7 +31,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.security:spring-security-oauth2-jose'
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:${mybatisSpringBootVersion}"
-    runtimeOnly "org.xerial:sqlite-jdbc:${sqliteJdbcVersion}"
+    runtimeOnly "org.postgresql:postgresql:${postgresqlJdbcVersion}"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'

@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TokenService {
-    private static final String ISSUER = "java25-sqlite-template";
+    private static final String ISSUER = "java25-postgresql-template";
     private static final Pattern DURATION_PATTERN = Pattern.compile("^(\\d+)([smhd])$");
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder jwtDecoder;

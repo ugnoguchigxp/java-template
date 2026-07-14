@@ -1,6 +1,5 @@
 package com.example.javastandard.config;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
@@ -40,11 +39,9 @@ public class EnvironmentValidator {
         if ("none".equals(sameSite) && !properties.isCookieSecure()) {
             throw new IllegalStateException("SameSite=None requires AUTH_COOKIE_SECURE=true.");
         }
-        String path = properties.getDatabasePath();
-        if (path == null || path.trim().isEmpty()
-                || path.startsWith("jdbc:") || path.startsWith("postgres:")
-                || path.startsWith("file:")) {
-            throw new IllegalStateException("DATABASE_URL must be a SQLite file path.");
+        String url = properties.getDatabaseUrl();
+        if (url == null || !url.startsWith("jdbc:postgresql://")) {
+            throw new IllegalStateException("DATABASE_URL must be a PostgreSQL JDBC URL.");
         }
         if (isProduction()) {
             if (properties.getJwtSecret().toLowerCase(Locale.ROOT).contains("development")) {
@@ -61,11 +58,6 @@ public class EnvironmentValidator {
                     .anyMatch("*"::equals)) {
                 throw new IllegalStateException("Wildcard CORS is not allowed in production.");
             }
-        }
-        File database = new File(path);
-        File parent = database.getAbsoluteFile().getParentFile();
-        if (parent != null && !parent.exists() && !parent.mkdirs()) {
-            throw new IllegalStateException("Cannot create SQLite database directory.");
         }
     }
 

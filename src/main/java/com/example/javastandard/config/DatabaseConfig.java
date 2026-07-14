@@ -10,10 +10,8 @@ public class DatabaseConfig {
     @Bean
     public DataSource dataSource(AppProperties properties) {
         HikariDataSource dataSource = new HikariDataSource();
-        String url = "jdbc:sqlite:" + properties.getDatabasePath()
-                + "?foreign_keys=true&journal_mode=WAL&busy_timeout=5000";
-        dataSource.setJdbcUrl(url);
-        dataSource.setDriverClassName("org.sqlite.JDBC");
+        dataSource.setJdbcUrl(properties.getDatabaseUrl());
+        dataSource.setDriverClassName("org.postgresql.Driver");
         dataSource.setMaximumPoolSize(4);
         dataSource.setConnectionTimeout(5000L);
         return dataSource;

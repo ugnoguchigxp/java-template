@@ -1,17 +1,17 @@
-import { mkdir, rm } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import { loadDotEnv, java25Env, run } from "./env";
 
 await loadDotEnv();
 await mkdir("tmp", { recursive: true });
-await rm("tmp/e2e.sqlite", { force: true });
-await rm("tmp/e2e.sqlite-shm", { force: true });
-await rm("tmp/e2e.sqlite-wal", { force: true });
+if (!process.env.POSTGRES_TEST_URL) {
+	throw new Error("POSTGRES_TEST_URL must point to a disposable PostgreSQL database.");
+}
 
 const env: Record<string, string> = {
 	...java25Env(),
 	SPRING_PROFILES_ACTIVE: "development",
 	HOST: "127.0.0.1",
-	DATABASE_URL: "tmp/e2e.sqlite",
+	DATABASE_URL: process.env.POSTGRES_TEST_URL,
 	JWT_SECRET: "e2e-secret-that-is-at-least-32-characters",
 	PORT: "5174",
 	APP_URL: "http://127.0.0.1:5174",
@@ -40,7 +40,7 @@ const child = Bun.spawn(
 	[
 		`${env.JAVA_HOME}/bin/java`,
 		"-jar",
-		"build/libs/java25-sqlite-template-0.1.0.jar",
+		"build/libs/java25-postgresql-template-0.1.0.jar",
 		"--server.port=5174",
 	],
 	{

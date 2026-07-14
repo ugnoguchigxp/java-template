@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,8 +24,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@EnabledIfEnvironmentVariable(named = "POSTGRES_TEST_URL", matches = "^jdbc:postgresql://.+")
 @TestPropertySource(properties = {
-        "DATABASE_URL=build/test-data/application.sqlite",
+        "DATABASE_URL=${POSTGRES_TEST_URL:jdbc:postgresql://127.0.0.1:5432/java_template}",
         "JWT_SECRET=test-secret-that-is-at-least-32-characters-long",
         "APP_URL=http://localhost:8080",
         "CORS_ORIGINS=http://localhost:8080"
@@ -58,17 +60,9 @@ public class ApplicationSmokeTest {
                 assertThat(result.next()).isTrue();
                 assertThat(result.getInt(1)).isEqualTo(1);
             }
-            try (ResultSet result = connection.createStatement().executeQuery("PRAGMA foreign_keys")) {
+            try (ResultSet result = connection.createStatement().executeQuery("SELECT 1")) {
                 assertThat(result.next()).isTrue();
                 assertThat(result.getInt(1)).isEqualTo(1);
-            }
-            try (ResultSet result = connection.createStatement().executeQuery("PRAGMA journal_mode")) {
-                assertThat(result.next()).isTrue();
-                assertThat(result.getString(1)).isEqualToIgnoringCase("wal");
-            }
-            try (ResultSet result = connection.createStatement().executeQuery("PRAGMA busy_timeout")) {
-                assertThat(result.next()).isTrue();
-                assertThat(result.getInt(1)).isEqualTo(5000);
             }
         }
     }
@@ -202,7 +196,7 @@ public class ApplicationSmokeTest {
         jakarta.servlet.http.Cookie access = login.getResponse().getCookie("access_token");
         try (Connection connection = dataSource.getConnection();
              java.sql.PreparedStatement statement = connection.prepareStatement(
-                     "UPDATE users SET is_active = 0 WHERE normalized_email = ?")) {
+                     "UPDATE users SET is_active = FALSE WHERE normalized_email = ?")) {
             statement.setString(1, email);
             statement.executeUpdate();
         }

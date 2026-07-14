@@ -37,7 +37,7 @@ public class MigrationRunner {
             }
             connection.commit();
         } catch (Exception exception) {
-            throw new IllegalStateException("SQLite migration failed.", exception);
+            throw new IllegalStateException("PostgreSQL migration failed.", exception);
         }
     }
 
