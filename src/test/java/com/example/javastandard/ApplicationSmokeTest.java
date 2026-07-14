@@ -58,6 +58,18 @@ public class ApplicationSmokeTest {
                 assertThat(result.next()).isTrue();
                 assertThat(result.getInt(1)).isEqualTo(1);
             }
+            try (ResultSet result = connection.createStatement().executeQuery("PRAGMA foreign_keys")) {
+                assertThat(result.next()).isTrue();
+                assertThat(result.getInt(1)).isEqualTo(1);
+            }
+            try (ResultSet result = connection.createStatement().executeQuery("PRAGMA journal_mode")) {
+                assertThat(result.next()).isTrue();
+                assertThat(result.getString(1)).isEqualToIgnoringCase("wal");
+            }
+            try (ResultSet result = connection.createStatement().executeQuery("PRAGMA busy_timeout")) {
+                assertThat(result.next()).isTrue();
+                assertThat(result.getInt(1)).isEqualTo(5000);
+            }
         }
     }
 
@@ -113,6 +125,12 @@ public class ApplicationSmokeTest {
     }
 
     @Test
+    void unknownApiRoutesAreNotPublic() throws Exception {
+        mockMvc.perform(get("/api/unknown"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void refreshTokenRotatesAndRejectsReplay() throws Exception {
         MvcResult csrf = mockMvc.perform(get("/api/csrf")).andReturn();
         jakarta.servlet.http.Cookie csrfCookie = csrf.getResponse().getCookie("XSRF-TOKEN");
@@ -155,6 +173,18 @@ public class ApplicationSmokeTest {
                         .header("X-XSRF-TOKEN", csrfCookie.getValue())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"email\":\"not-an-email\",\"password\":\"\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void malformedJsonReturnsBadRequest() throws Exception {
+        MvcResult csrf = mockMvc.perform(get("/api/csrf")).andReturn();
+        jakarta.servlet.http.Cookie csrfCookie = csrf.getResponse().getCookie("XSRF-TOKEN");
+        mockMvc.perform(post("/api/auth/login")
+                        .cookie(csrfCookie)
+                        .header("X-XSRF-TOKEN", csrfCookie.getValue())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{invalid-json"))
                 .andExpect(status().isBadRequest());
     }
 

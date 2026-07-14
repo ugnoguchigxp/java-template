@@ -5,7 +5,7 @@ const commands: string[][] = [
 	["bun", "run", "lint"],
 	["bun", "run", "format:check"],
 	["bun", "run", "contract:check"],
-	["bun", "run", "test"],
+	["bun", "run", "test:coverage"],
 	["bun", "run", "build:web"],
 	[
 		"./gradlew",

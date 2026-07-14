@@ -33,6 +33,16 @@ public class EnvironmentValidatorTest {
                 .hasMessage("Wildcard CORS is not allowed in production.");
     }
 
+    @Test
+    void rejectsOverflowingDuration() {
+        AppProperties properties = properties();
+        properties.setJwtRefreshTtl("999999999999999999999d");
+
+        assertThatThrownBy(() -> new EnvironmentValidator(properties, productionEnvironment()).validate())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("JWT_REFRESH_TTL must be a positive duration such as 15m or 30d.");
+    }
+
     private AppProperties properties() {
         AppProperties properties = new AppProperties();
         properties.setDatabasePath("build/test-data/validator.sqlite");

@@ -35,6 +35,8 @@ public class EnvironmentValidator {
         if (!SAME_SITE_VALUES.contains(sameSite)) {
             throw new IllegalStateException("AUTH_COOKIE_SAME_SITE must be Lax, Strict, or None.");
         }
+        validateDuration(properties.getJwtAccessTtl(), "JWT_ACCESS_TTL");
+        validateDuration(properties.getJwtRefreshTtl(), "JWT_REFRESH_TTL");
         if ("none".equals(sameSite) && !properties.isCookieSecure()) {
             throw new IllegalStateException("SameSite=None requires AUTH_COOKIE_SECURE=true.");
         }
@@ -72,5 +74,26 @@ public class EnvironmentValidator {
             if ("production".equalsIgnoreCase(profile)) return true;
         }
         return false;
+    }
+
+    private void validateDuration(String value, String name) {
+        if (value == null || !value.matches("^\\d+[smhd]$")) {
+            throw new IllegalStateException(name + " must be a positive duration such as 15m or 30d.");
+        }
+        try {
+            long amount = Long.parseLong(value.substring(0, value.length() - 1));
+            if (amount <= 0) throw new ArithmeticException();
+            long seconds;
+            switch (value.charAt(value.length() - 1)) {
+                case 's': seconds = amount; break;
+                case 'm': seconds = Math.multiplyExact(amount, 60L); break;
+                case 'h': seconds = Math.multiplyExact(amount, 60L * 60L); break;
+                case 'd': seconds = Math.multiplyExact(amount, 60L * 60L * 24L); break;
+                default: throw new ArithmeticException();
+            }
+            Math.multiplyExact(seconds, 1000L);
+        } catch (NumberFormatException | ArithmeticException exception) {
+            throw new IllegalStateException(name + " must be a positive duration such as 15m or 30d.", exception);
+        }
     }
 }

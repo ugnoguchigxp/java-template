@@ -4,6 +4,7 @@ import com.example.javastandard.auth.AuthException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -24,6 +25,13 @@ public class GlobalExceptionHandler {
                 fields.put(error.getField(), error.getDefaultMessage()));
         return ResponseEntityFactory.of(HttpStatus.BAD_REQUEST,
                 new ErrorResponse("Validation failed.", "VALIDATION_ERROR", fields));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public org.springframework.http.ResponseEntity<ErrorResponse> unreadable(
+            HttpMessageNotReadableException exception) {
+        return ResponseEntityFactory.of(HttpStatus.BAD_REQUEST,
+                new ErrorResponse("Request body is invalid.", "VALIDATION_ERROR"));
     }
 
     @ExceptionHandler(Exception.class)

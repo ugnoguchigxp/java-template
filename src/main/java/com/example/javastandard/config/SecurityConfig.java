@@ -90,6 +90,7 @@ public class SecurityConfig {
                         "/api/auth/login", "/api/auth/refresh", "/api/auth/logout").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/me", "/api/protected/**").authenticated()
+                .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll())
                 .headers(headers -> headers
                 .contentSecurityPolicy(policy -> policy.policyDirectives(

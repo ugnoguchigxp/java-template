@@ -9,6 +9,8 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TokenService {
     private static final String ISSUER = "java25-sqlite-template";
+    private static final Pattern DURATION_PATTERN = Pattern.compile("^(\\d+)([smhd])$");
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder jwtDecoder;
     private final RefreshTokenRepository refreshTokens;
@@ -65,7 +68,8 @@ public class TokenService {
         record.setTokenHash(hash(token));
         record.setUserId(user.getId());
         record.setCreatedAt(now);
-        record.setExpiresAt(now + parseDuration(properties.getJwtRefreshTtl()) * 1000L);
+        long refreshMillis = Math.multiplyExact(parseDuration(properties.getJwtRefreshTtl()), 1000L);
+        record.setExpiresAt(Math.addExact(now, refreshMillis));
         refreshTokens.insert(record);
         return token;
     }
@@ -107,16 +111,22 @@ public class TokenService {
     }
 
     public long parseDuration(String value) {
-        if (value == null || !value.matches("^\\d+[smhd]$")) {
+        Matcher matcher = DURATION_PATTERN.matcher(value == null ? "" : value);
+        if (!matcher.matches()) {
             throw new IllegalStateException("Invalid duration.");
         }
-        long amount = Long.parseLong(value.substring(0, value.length() - 1));
-        switch (value.charAt(value.length() - 1)) {
-            case 's': return amount;
-            case 'm': return amount * 60L;
-            case 'h': return amount * 60L * 60L;
-            case 'd': return amount * 60L * 60L * 24L;
-            default: throw new IllegalStateException("Invalid duration.");
+        try {
+            long amount = Long.parseLong(matcher.group(1));
+            if (amount <= 0) throw new IllegalStateException("Invalid duration.");
+            switch (matcher.group(2).charAt(0)) {
+                case 's': return amount;
+                case 'm': return Math.multiplyExact(amount, 60L);
+                case 'h': return Math.multiplyExact(amount, 60L * 60L);
+                case 'd': return Math.multiplyExact(amount, 60L * 60L * 24L);
+                default: throw new IllegalStateException("Invalid duration.");
+            }
+        } catch (NumberFormatException | ArithmeticException exception) {
+            throw new IllegalStateException("Invalid duration.", exception);
         }
     }
 }
