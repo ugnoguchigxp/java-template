@@ -35,7 +35,7 @@ public class EnvironmentValidatorTest {
 
     private AppProperties properties() {
         AppProperties properties = new AppProperties();
-        properties.setDatabasePath("build/test-data/validator.sqlite");
+        properties.setDatabaseUrl("jdbc:postgresql://127.0.0.1:5432/java_template");
         properties.setJwtSecret("production-secret-that-is-at-least-32-characters");
         properties.setCorsOrigins("https://example.com");
         return properties;

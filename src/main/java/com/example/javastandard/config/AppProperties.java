@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
-    private String databasePath = "data/sqlite.db";
+    private String databaseUrl = "jdbc:postgresql://127.0.0.1:5432/java_template";
     private String jwtSecret;
     private String jwtAccessTtl = "15m";
     private String jwtRefreshTtl = "30d";
@@ -13,8 +13,8 @@ public class AppProperties {
     private boolean cookieSecure;
     private String cookieSameSite = "Lax";
 
-    public String getDatabasePath() { return databasePath; }
-    public void setDatabasePath(String databasePath) { this.databasePath = databasePath; }
+    public String getDatabaseUrl() { return databaseUrl; }
+    public void setDatabaseUrl(String databaseUrl) { this.databaseUrl = databaseUrl; }
     public String getJwtSecret() { return jwtSecret; }
     public void setJwtSecret(String jwtSecret) { this.jwtSecret = jwtSecret; }
     public String getJwtAccessTtl() { return jwtAccessTtl; }

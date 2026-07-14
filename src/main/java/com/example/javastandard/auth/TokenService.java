@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TokenService {
-    private static final String ISSUER = "java8-sqlite-template";
+    private static final String ISSUER = "java8-postgresql-template";
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder jwtDecoder;
     private final RefreshTokenRepository refreshTokens;

@@ -5,14 +5,14 @@ server:
 
 spring:
   application:
-    name: java8-sqlite-template
+    name: java8-postgresql-template
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:development}
   jackson:
     default-property-inclusion: non_null
 
 mybatis:
-  mapper-locations: classpath*:mybatis/sqlite/*.xml
+  mapper-locations: classpath*:mybatis/postgresql/*.xml
   type-aliases-package: com.example.javastandard.db.model
   configuration:
     map-underscore-to-camel-case: true
@@ -20,7 +20,7 @@ mybatis:
     jdbc-type-for-null: null
 
 app:
-  database-path: ${DATABASE_URL:data/sqlite.db}
+  database-url: ${DATABASE_URL:jdbc:postgresql://127.0.0.1:5432/java_template}
   jwt-secret: ${JWT_SECRET:development-only-change-me-please-32-characters}
   jwt-access-ttl: ${JWT_ACCESS_TTL:15m}
   jwt-refresh-ttl: ${JWT_REFRESH_TTL:30d}

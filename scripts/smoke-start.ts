@@ -7,7 +7,7 @@ const child = Bun.spawn(
 	[
 		`${env.JAVA_HOME}/bin/java`,
 		"-jar",
-		"build/libs/java8-sqlite-template-0.1.0.jar",
+		"build/libs/java8-postgresql-template-0.1.0.jar",
 	],
 	{
 		stdout: "inherit",

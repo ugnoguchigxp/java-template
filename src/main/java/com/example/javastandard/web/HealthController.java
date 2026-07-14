@@ -13,7 +13,7 @@ public class HealthController {
     public Map<String, String> health() {
         Map<String, String> response = new LinkedHashMap<String, String>();
         response.put("status", "ok");
-        response.put("service", "java8-sqlite-template");
+        response.put("service", "java8-postgresql-template");
         return response;
     }
 }
